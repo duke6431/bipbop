@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '11.0'
   s.swift_version = '5.0'
   s.license = { :type => 'MIT' }
-  s.default_subspec = 'Logged'
+  s.default_subspec = 'Minimal'
   
   # Subspecs zone
   s.subspec 'Minimal' do |ss|
