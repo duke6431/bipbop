@@ -48,3 +48,14 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Swift
+*.xcuserstate
+xcuserdata
+
+# Cocoapods
+Pods
+Podfile.lock
+
+# Swift Package Manager
+.swiftpm
+.build
