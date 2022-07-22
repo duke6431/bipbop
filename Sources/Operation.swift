@@ -6,8 +6,8 @@
 //
 
 import Foundation
-#if canImport(Logger)
-import Logger
+#if canImport(LoggerCenter)
+import LoggerCenter
 #endif
 class StackableOperationsQueue {
     private let executionQueue = DispatchQueue(label: "custom_queue_\(UUID().uuidString)", qos: .background,
@@ -22,8 +22,8 @@ class StackableOperationsQueue {
     fileprivate func _append(operation: QueueOperation) {
         semaphore.wait()
         operations.append(operation)
-#if canImport(Logger)
-        Logger.default.debug("Operation added")
+#if canImport(LoggerCenter)
+        LogCenter.default.debug("Operation added")
 #endif
         semaphore.signal()
     }
@@ -32,8 +32,8 @@ class StackableOperationsQueue {
     func clear() {
         semaphore.wait()
         operations = []
-#if canImport(Logger)
-        Logger.default.debug("Operation cleared")
+#if canImport(LoggerCenter)
+        LogCenter.default.debug("Operation cleared")
 #endif
         semaphore.signal()
     }
@@ -44,18 +44,18 @@ class StackableOperationsQueue {
     
     func _execute() {
         guard !haltExecution else {
-#if canImport(Logger)
-            Logger.default.warning("Stopping automate execution")
+#if canImport(LoggerCenter)
+            LogCenter.default.warning("Stopping automate execution")
 #endif
             completion?(false)
             return
         }
         semaphore.wait()
         guard !operations.isEmpty, !isExecuting else {
-#if canImport(Logger)
-            Logger.default.debug("Operation is empty or is executing")
-            Logger.default.debug("Operation count: \(operations.count)")
-            Logger.default.debug("Executing: \(isExecuting)")
+#if canImport(LoggerCenter)
+            LogCenter.default.debug("Operation is empty or is executing")
+            LogCenter.default.debug("Operation count: \(operations.count)")
+            LogCenter.default.debug("Executing: \(isExecuting)")
 #endif
             if operations.isEmpty { completion?(true) }
             semaphore.signal()
@@ -64,8 +64,8 @@ class StackableOperationsQueue {
         let operation = operations.removeFirst()
         isExecuting = true
         semaphore.signal()
-#if canImport(Logger)
-        Logger.default.debug("Running on main thread: \(Thread.isMainThread)")
+#if canImport(LoggerCenter)
+        LogCenter.default.debug("Running on main thread: \(Thread.isMainThread)")
 #endif
         if operation.waitOperation {
             operation.perform()
@@ -74,8 +74,8 @@ class StackableOperationsQueue {
                 operation.perform()
             }
         }
-#if canImport(Logger)
-        Logger.default.debug("Performing call")
+#if canImport(LoggerCenter)
+        LogCenter.default.debug("Performing call")
 #endif
         semaphore.wait()
         isExecuting = false

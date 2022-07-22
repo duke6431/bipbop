@@ -6,8 +6,8 @@
 //
 
 import UIKit
-#if canImport(Logger)
-import Logger
+#if canImport(LoggerCenter)
+import LoggerCenter
 #endif
 
 public class WaitComponent: AutomationComponent {
@@ -41,8 +41,8 @@ public struct Step<T>: Executable where T: AutomationComponent {
             }
             if let identifier = identifier {
                 repeat {
-#if canImport(Logger)
-                    Logger.default.debug("Attempt number \(retries + 1)")
+#if canImport(LoggerCenter)
+                    LogCenter.default.debug("Attempt number \(retries + 1)")
 #endif
                     if retries >= self.retries {
                         throw Automation.ComponentError.componentNotFound(name: identifier)
@@ -51,8 +51,8 @@ public struct Step<T>: Executable where T: AutomationComponent {
                         executable(view)
                         break
                     } else {
-#if canImport(Logger)
-                        Logger.default.info("\(Automation.ComponentError.componentNotFound(name: identifier).localizedDescription)Retrying...")
+#if canImport(LoggerCenter)
+                        LogCenter.default.info("\(Automation.ComponentError.componentNotFound(name: identifier).localizedDescription)Retrying...")
 #endif
                         retries += 1
                         Thread.sleep(forTimeInterval: 2)
@@ -60,8 +60,8 @@ public struct Step<T>: Executable where T: AutomationComponent {
                 } while(true)
             } else if let searchAssist = searchAssist {
                 repeat {
-#if canImport(Logger)
-                    Logger.default.debug("Attempt number \(retries + 1)")
+#if canImport(LoggerCenter)
+                    LogCenter.default.debug("Attempt number \(retries + 1)")
 #endif
                     if retries >= self.retries {
                         throw Automation.ComponentError.componentNotFound(name: "search assist criteria")
@@ -75,8 +75,8 @@ public struct Step<T>: Executable where T: AutomationComponent {
                         executable(view)
                         break
                     } else {
-#if canImport(Logger)
-                        Logger.default.info("\(Automation.ComponentError.componentNotFound(name: "search assist criteria").localizedDescription)Retrying...")
+#if canImport(LoggerCenter)
+                        LogCenter.default.info("\(Automation.ComponentError.componentNotFound(name: "search assist criteria").localizedDescription)Retrying...")
 #endif
                         retries += 1
                         Thread.sleep(forTimeInterval: 2)
@@ -86,8 +86,8 @@ public struct Step<T>: Executable where T: AutomationComponent {
                 throw Automation.ComponentError.searchMethodNotProvided
             }
         case .wait(let timeInSeconds):
-#if canImport(Logger)
-            Logger.default.debug("Sleeping for \(timeInSeconds) second(s)")
+#if canImport(LoggerCenter)
+            LogCenter.default.debug("Sleeping for \(timeInSeconds) second(s)")
 #endif
             Thread.sleep(forTimeInterval: timeInSeconds)
         case .freeExec(let execution):
@@ -132,8 +132,8 @@ public class StepGroup: Executable {
     }
     
     public func execute() {
-#if canImport(Logger)
-        Logger.default.info("Executing group \(name)")
+#if canImport(LoggerCenter)
+        LogCenter.default.info("Executing group \(name)")
 #endif
         stackableOperationsQueue.execute()
     }
@@ -146,8 +146,8 @@ public class StepGroup: Executable {
                     do {
                         try step.execute()
                     } catch {
-#if canImport(Logger)
-                        Logger.default.error("\(error.localizedDescription)")
+#if canImport(LoggerCenter)
+                        LogCenter.default.error("\(error.localizedDescription)")
 #endif
                         self?.stackableOperationsQueue.haltExecution = true
                     }
@@ -157,8 +157,8 @@ public class StepGroup: Executable {
                     do {
                         try step.execute()
                     } catch {
-#if canImport(Logger)
-                        Logger.default.error("\(error.localizedDescription)")
+#if canImport(LoggerCenter)
+                        LogCenter.default.error("\(error.localizedDescription)")
 #endif
                         self?.stackableOperationsQueue.haltExecution = true
                     }

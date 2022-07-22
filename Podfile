@@ -6,7 +6,11 @@ target 'Automation' do
   use_frameworks!
 
   # Pods for Automation
-  pod 'Logger', :path => '../Logger'
+  pod 'Logging', :path => '../swift-log'
+  pod 'PulseUI', :path => '../pulse'
+  pod 'Pulse', :path => '../pulse'
+  pod 'PulseCore', :path => '../pulse'
+  pod 'LoggerCenter', :path => '../logger'
   target 'Example' do
     # Pods for example
   end

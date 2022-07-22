@@ -6,8 +6,8 @@
 //
 
 import UIKit
-#if canImport(Logger)
-import Logger
+#if canImport(LoggerCenter)
+import LoggerCenter
 #endif
 public struct Automation {
     public static var delayTime: TimeInterval = 0.5
@@ -16,8 +16,8 @@ public struct Automation {
 extension UIButton: Tappable {
     public func tap() {
         self.sendActions(for: .touchUpInside)
-#if canImport(Logger)
-        Logger.default.info("Tapped button \(identifier() ?? "Empty")")
+#if canImport(LoggerCenter)
+        LogCenter.default.info("Tapped button \(identifier() ?? "Empty")")
 #endif
     }
     
@@ -28,19 +28,19 @@ extension UIButton: Tappable {
 
 extension UIView: Searchable, PropertyReflectable, AutomationComponent {
     public func find(identifier: String) -> UIView? {
-#if canImport(Logger)
-        Logger.default.debug("Identifier: \(self.identifier() ?? "Empty")")
+#if canImport(LoggerCenter)
+        LogCenter.default.debug("Identifier: \(self.identifier() ?? "Empty")")
 #endif
         if self.identifier()?.lowercased().contains(identifier.lowercased()) ?? false {
             return self
         }
         for subview in subviews {
-#if canImport(Logger)
-            Logger.default.verbose("Component type: \(type(of: subview))")
+#if canImport(LoggerCenter)
+            LogCenter.default.verbose("Component type: \(type(of: subview))")
 #endif
             if let found = subview.find(identifier: identifier) {
-#if canImport(Logger)
-                Logger.default.verbose("found")
+#if canImport(LoggerCenter)
+                LogCenter.default.verbose("found")
 #endif
                 return found
             }
@@ -51,8 +51,8 @@ extension UIView: Searchable, PropertyReflectable, AutomationComponent {
     public func find(searchAssist: (Searchable) -> Bool) -> UIView? {
         if searchAssist(self) { return self }
         for subview in subviews {
-#if canImport(Logger)
-            Logger.default.verbose("Component type: \(type(of: subview))")
+#if canImport(LoggerCenter)
+            LogCenter.default.verbose("Component type: \(type(of: subview))")
 #endif
             if let view = subview.find(searchAssist: searchAssist) {
                 return view
@@ -100,13 +100,13 @@ extension UITextField: Typable {
 extension UICollectionViewCell: Tappable {
     public func tap() {
         guard let collectionView = interactableComponents(kind: UICollectionView.self), let index = collectionView.indexPath(for: self) else {
-#if canImport(Logger)
-            Logger.default.warning("Orphan collection view cell")
+#if canImport(LoggerCenter)
+            LogCenter.default.warning("Orphan collection view cell")
 #endif
             return
         }
-#if canImport(Logger)
-        Logger.default.debug("Selecting cell")
+#if canImport(LoggerCenter)
+        LogCenter.default.debug("Selecting cell")
 #endif
         collectionView.selectItem(at: index, animated: true, scrollPosition: .centeredHorizontally)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
@@ -118,13 +118,13 @@ extension UICollectionViewCell: Tappable {
 extension UITableViewCell: Tappable {
     public func tap() {
         guard let table = interactableComponents(kind: UITableView.self), let index = table.indexPath(for: self) else {
-#if canImport(Logger)
-            Logger.default.warning("Orphan table view cell")
+#if canImport(LoggerCenter)
+            LogCenter.default.warning("Orphan table view cell")
 #endif
             return
         }
-#if canImport(Logger)
-        Logger.default.debug("Selecting cell")
+#if canImport(LoggerCenter)
+        LogCenter.default.debug("Selecting cell")
 #endif
         table.selectRow(at: index, animated: false, scrollPosition: .none)
         table.delegate?.tableView?(table, didSelectRowAt: index)
