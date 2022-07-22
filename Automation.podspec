@@ -27,6 +27,6 @@ Pod::Spec.new do |s|
   
   s.subspec 'Logged' do |ss|
     ss.dependency 'Automation/Minimal'
-    ss.dependency 'Logger'
+    ss.dependency 'LoggerCenter'
   end
 end
