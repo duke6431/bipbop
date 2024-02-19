@@ -89,9 +89,9 @@ class StackableOperationsQueue {
     }
 }
 
-// MARK: - StackableOperationsCuncurentQueue performs functions from the stack one by one (serial performing) but in cuncurent queue
+// MARK: - StackableOperationsCuncurentQueue performs functions from the stack one by one (serial performing) but in concurrent queue
 
-class StackableOperationsConcurentQueue: StackableOperationsQueue {
+class StackableOperationsConcurrentQueue: StackableOperationsQueue {
     private var queue: DispatchQueue
     init(queue: DispatchQueue) { self.queue = queue }
     override func append(operation: QueueOperation) {

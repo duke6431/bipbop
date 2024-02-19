@@ -113,10 +113,10 @@ public class StepGroup: Executable {
         return executables
     }
     
-    private lazy var stackableOperationsQueue: StackableOperationsConcurentQueue = {
+    private lazy var stackableOperationsQueue: StackableOperationsConcurrentQueue = {
         let queue = DispatchQueue(label: "custom_queue", qos: .background,
                                   attributes: [.concurrent], autoreleaseFrequency: .workItem, target: nil)
-        return StackableOperationsConcurentQueue(queue: queue)
+        return StackableOperationsConcurrentQueue(queue: queue)
     }()
     
     public init(name: String, steps: [Executable] = [], completion: ((Bool) -> Void)? = nil) {
