@@ -1,6 +1,6 @@
 //
 //  HelperExts.swift
-//  Automation
+//  BipBop
 //
 //  Created by Duc Minh Nguyen on 5/2/22.
 //
@@ -9,13 +9,32 @@ import UIKit
 
 extension UIViewController {
     class func topMostViewController() -> UIViewController? {
-        if var topController = UIApplication.shared.keyWindow?.rootViewController {
-            while let presentedViewController = topController.presentedViewController {
-                topController = presentedViewController
+        var topViewController: UIViewController? = nil
+        if #available(iOS 13, *) {
+            for scene in UIApplication.shared.connectedScenes {
+                if let windowScene = scene as? UIWindowScene {
+                    for window in windowScene.windows {
+                        if window.isKeyWindow {
+                            topViewController = window.rootViewController
+                        }
+                    }
+                }
             }
-            
-            return topController
+        } else {
+            topViewController = UIApplication.shared.keyWindow?.rootViewController
         }
-        return nil
+        while true {
+            if let presented = topViewController?.presentedViewController {
+                topViewController = presented
+            } else if let navController = topViewController as? UINavigationController {
+                topViewController = navController.topViewController
+            } else if let tabBarController = topViewController as? UITabBarController {
+                topViewController = tabBarController.selectedViewController
+            } else {
+                // Handle any other third party container in `else if` if required
+                break
+            }
+        }
+        return topViewController
     }
 }

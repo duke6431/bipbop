@@ -1,14 +1,12 @@
 //
 //  Operation.swift
-//  Automation
+//  BipBop
 //
 //  Created by Duc IT. Nguyen Minh on 17/03/2022.
 //
 
 import Foundation
-#if canImport(LoggerCenter)
-import LoggerCenter
-#endif
+
 class StackableOperationsQueue {
     private let executionQueue = DispatchQueue(label: "custom_queue_\(UUID().uuidString)", qos: .background,
                                                attributes: [.concurrent], autoreleaseFrequency: .workItem, target: nil)
@@ -17,14 +15,14 @@ class StackableOperationsQueue {
     private lazy var isExecuting = false
     lazy var haltExecution = false
     var completion: ((Bool) -> Void)?
-    public var delayTime: TimeInterval = Automation.delayTime
+    public var delayTime: TimeInterval = BipBop.delayTime
     
     fileprivate func _append(operation: QueueOperation) {
         semaphore.wait()
         operations.append(operation)
-#if canImport(LoggerCenter)
-        LogCenter.default.debug("Operation added")
-#endif
+        if BipBop.enableLogging {
+            BipBop.logger.trace("Operation added")
+        }
         semaphore.signal()
     }
     
@@ -32,9 +30,9 @@ class StackableOperationsQueue {
     func clear() {
         semaphore.wait()
         operations = []
-#if canImport(LoggerCenter)
-        LogCenter.default.debug("Operation cleared")
-#endif
+        if BipBop.enableLogging {
+            BipBop.logger.trace("Operation cleared")
+        }
         semaphore.signal()
     }
     
@@ -44,19 +42,19 @@ class StackableOperationsQueue {
     
     func _execute() {
         guard !haltExecution else {
-#if canImport(LoggerCenter)
-            LogCenter.default.warning("Stopping automate execution")
-#endif
+            if BipBop.enableLogging {
+                BipBop.logger.warning("Stopping automate execution")
+            }
             completion?(false)
             return
         }
         semaphore.wait()
         guard !operations.isEmpty, !isExecuting else {
-#if canImport(LoggerCenter)
-            LogCenter.default.debug("Operation is empty or is executing")
-            LogCenter.default.debug("Operation count: \(operations.count)")
-            LogCenter.default.debug("Executing: \(isExecuting)")
-#endif
+            if BipBop.enableLogging {
+                BipBop.logger.trace("Operation is empty or is executing")
+                BipBop.logger.trace("Operation count: \(operations.count)")
+                BipBop.logger.trace("Executing: \(isExecuting)")
+            }
             if operations.isEmpty { completion?(true) }
             semaphore.signal()
             return
@@ -64,9 +62,9 @@ class StackableOperationsQueue {
         let operation = operations.removeFirst()
         isExecuting = true
         semaphore.signal()
-#if canImport(LoggerCenter)
-        LogCenter.default.debug("Running on main thread: \(Thread.isMainThread)")
-#endif
+        if BipBop.enableLogging {
+            BipBop.logger.trace("Running on main thread: \(Thread.isMainThread)")
+        }
         if operation.waitOperation {
             operation.perform()
         } else {
@@ -74,9 +72,9 @@ class StackableOperationsQueue {
                 operation.perform()
             }
         }
-#if canImport(LoggerCenter)
-        LogCenter.default.debug("Performing call")
-#endif
+        if BipBop.enableLogging {
+            BipBop.logger.trace("Performing call")
+        }
         semaphore.wait()
         isExecuting = false
         if delayTime > 0 {

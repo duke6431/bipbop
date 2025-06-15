@@ -1,13 +1,13 @@
 //
 //  Error.swift
-//  Automation
+//  BipBop
 //
 //  Created by Duc Minh Nguyen on 5/2/22.
 //
 
 import Foundation
 
-extension Automation {
+extension BipBop {
     public enum ComponentError: Error {
         case componentNotFound(name: String)
         case rootViewNotFound
@@ -15,7 +15,7 @@ extension Automation {
     }
 }
 
-extension Automation.ComponentError: LocalizedError {
+extension BipBop.ComponentError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .componentNotFound(let name):

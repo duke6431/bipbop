@@ -1,24 +1,25 @@
 //
-//  Automation.swift
-//  Automation
+//  BipBop.swift
+//  BipBop
 //
 //  Created by Duc IT. Nguyen Minh on 17/03/2022.
 //
 
 import UIKit
-#if canImport(LoggerCenter)
-import LoggerCenter
-#endif
-public struct Automation {
+import Logging
+
+public struct BipBop {
+    public static var enableLogging: Bool = false
     public static var delayTime: TimeInterval = 0.5
+    public static let logger = Logger(label: "BipBopAutomation")
 }
 
 extension UIButton: Tappable {
     public func tap() {
         self.sendActions(for: .touchUpInside)
-#if canImport(LoggerCenter)
-        LogCenter.default.info("Tapped button \(identifier() ?? "Empty")")
-#endif
+        if BipBop.enableLogging {
+            BipBop.logger.info("Tapped button \(identifier() ?? "Empty")")
+        }
     }
     
     @objc public override func identifier() -> String? {
@@ -28,20 +29,20 @@ extension UIButton: Tappable {
 
 extension UIView: Searchable, PropertyReflectable, AutomationComponent {
     public func find(identifier: String) -> UIView? {
-#if canImport(LoggerCenter)
-        LogCenter.default.debug("Identifier: \(self.identifier() ?? "Empty")")
-#endif
+        if BipBop.enableLogging {
+            BipBop.logger.trace("Identifier: \(self.identifier() ?? "Empty")")
+        }
         if self.identifier()?.lowercased().contains(identifier.lowercased()) ?? false {
             return self
         }
         for subview in subviews {
-#if canImport(LoggerCenter)
-            LogCenter.default.verbose("Component type: \(type(of: subview))")
-#endif
+            if BipBop.enableLogging {
+                BipBop.logger.trace("Component type: \(type(of: subview))")
+            }
             if let found = subview.find(identifier: identifier) {
-#if canImport(LoggerCenter)
-                LogCenter.default.verbose("found")
-#endif
+                if BipBop.enableLogging {
+                    BipBop.logger.trace("found")
+                }
                 return found
             }
         }
@@ -51,9 +52,9 @@ extension UIView: Searchable, PropertyReflectable, AutomationComponent {
     public func find(searchAssist: (Searchable) -> Bool) -> UIView? {
         if searchAssist(self) { return self }
         for subview in subviews {
-#if canImport(LoggerCenter)
-            LogCenter.default.verbose("Component type: \(type(of: subview))")
-#endif
+            if BipBop.enableLogging {
+                BipBop.logger.trace("Component type: \(type(of: subview))")
+            }
             if let view = subview.find(searchAssist: searchAssist) {
                 return view
             }
@@ -100,14 +101,14 @@ extension UITextField: Typable {
 extension UICollectionViewCell: Tappable {
     public func tap() {
         guard let collectionView = interactableComponents(kind: UICollectionView.self), let index = collectionView.indexPath(for: self) else {
-#if canImport(LoggerCenter)
-            LogCenter.default.warning("Orphan collection view cell")
-#endif
+            if BipBop.enableLogging {
+                BipBop.logger.warning("Orphan collection view cell")
+            }
             return
         }
-#if canImport(LoggerCenter)
-        LogCenter.default.debug("Selecting cell")
-#endif
+        if BipBop.enableLogging {
+            BipBop.logger.trace("Selecting cell")
+        }
         collectionView.selectItem(at: index, animated: true, scrollPosition: .centeredHorizontally)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
             collectionView.delegate?.collectionView?(collectionView, didSelectItemAt: index)
@@ -118,14 +119,14 @@ extension UICollectionViewCell: Tappable {
 extension UITableViewCell: Tappable {
     public func tap() {
         guard let table = interactableComponents(kind: UITableView.self), let index = table.indexPath(for: self) else {
-#if canImport(LoggerCenter)
-            LogCenter.default.warning("Orphan table view cell")
-#endif
+            if BipBop.enableLogging {
+                BipBop.logger.warning("Orphan table view cell")
+            }
             return
         }
-#if canImport(LoggerCenter)
-        LogCenter.default.debug("Selecting cell")
-#endif
+        if BipBop.enableLogging {
+            BipBop.logger.trace("Selecting cell")
+        }
         table.selectRow(at: index, animated: false, scrollPosition: .none)
         table.delegate?.tableView?(table, didSelectRowAt: index)
     }

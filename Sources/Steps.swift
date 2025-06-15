@@ -1,14 +1,11 @@
 //
 //  Steps.swift
-//  Automation
+//  BipBop
 //
 //  Created by Duc Minh Nguyen on 5/2/22.
 //
 
 import UIKit
-#if canImport(LoggerCenter)
-import LoggerCenter
-#endif
 
 public class WaitComponent: AutomationComponent {
     public func interactableComponents<K>(kind: K.Type) -> K? where K : UIView {
@@ -37,34 +34,34 @@ public struct Step<T>: Executable where T: AutomationComponent {
         switch action {
         case .searchAndExec(let identifier, let searchAssist, let executable):
             guard let rootView = UIViewController.topMostViewController()?.view else {
-                throw Automation.ComponentError.rootViewNotFound
+                throw BipBop.ComponentError.rootViewNotFound
             }
             if let identifier = identifier {
                 repeat {
-#if canImport(LoggerCenter)
-                    LogCenter.default.debug("Attempt number \(retries + 1)")
-#endif
+                    if BipBop.enableLogging {
+                        BipBop.logger.warning("Attempt number \(retries + 1)")
+                    }
                     if retries >= self.retries {
-                        throw Automation.ComponentError.componentNotFound(name: identifier)
+                        throw BipBop.ComponentError.componentNotFound(name: identifier)
                     }
                     if let view = rootView.find(identifier: identifier) as? T {
                         executable(view)
                         break
                     } else {
-#if canImport(LoggerCenter)
-                        LogCenter.default.info("\(Automation.ComponentError.componentNotFound(name: identifier).localizedDescription)Retrying...")
-#endif
+                        if BipBop.enableLogging {
+                            BipBop.logger.warning("\(BipBop.ComponentError.componentNotFound(name: identifier).localizedDescription)Retrying...")
+                        }
                         retries += 1
                         Thread.sleep(forTimeInterval: 2)
                     }
                 } while(true)
             } else if let searchAssist = searchAssist {
                 repeat {
-#if canImport(LoggerCenter)
-                    LogCenter.default.debug("Attempt number \(retries + 1)")
-#endif
+                    if BipBop.enableLogging {
+                        BipBop.logger.warning("Attempt number \(retries + 1)")
+                    }
                     if retries >= self.retries {
-                        throw Automation.ComponentError.componentNotFound(name: "search assist criteria")
+                        throw BipBop.ComponentError.componentNotFound(name: "search assist criteria")
                     }
                     if let view = rootView.find(searchAssist: { (component: Searchable) -> Bool in
                         guard let component = component as? T else {
@@ -75,20 +72,20 @@ public struct Step<T>: Executable where T: AutomationComponent {
                         executable(view)
                         break
                     } else {
-#if canImport(LoggerCenter)
-                        LogCenter.default.info("\(Automation.ComponentError.componentNotFound(name: "search assist criteria").localizedDescription)Retrying...")
-#endif
+                        if BipBop.enableLogging {
+                            BipBop.logger.error("\(BipBop.ComponentError.componentNotFound(name: "search assist criteria").localizedDescription)Retrying...")
+                        }
                         retries += 1
                         Thread.sleep(forTimeInterval: 2)
                     }
                 } while(true)
             } else {
-                throw Automation.ComponentError.searchMethodNotProvided
+                throw BipBop.ComponentError.searchMethodNotProvided
             }
         case .wait(let timeInSeconds):
-#if canImport(LoggerCenter)
-            LogCenter.default.debug("Sleeping for \(timeInSeconds) second(s)")
-#endif
+            if BipBop.enableLogging {
+                BipBop.logger.trace("Sleeping for \(timeInSeconds) second(s)")
+            }
             Thread.sleep(forTimeInterval: timeInSeconds)
         case .freeExec(let execution):
             execution()
@@ -132,9 +129,9 @@ public class StepGroup: Executable {
     }
     
     public func execute() {
-#if canImport(LoggerCenter)
-        LogCenter.default.info("Executing group \(name)")
-#endif
+        if BipBop.enableLogging {
+            BipBop.logger.trace("Executing group \(name)")
+        }
         stackableOperationsQueue.execute()
     }
     
@@ -146,9 +143,9 @@ public class StepGroup: Executable {
                     do {
                         try step.execute()
                     } catch {
-#if canImport(LoggerCenter)
-                        LogCenter.default.error("\(error.localizedDescription)")
-#endif
+                        if BipBop.enableLogging {
+                            BipBop.logger.error("\(error.localizedDescription)")
+                        }
                         self?.stackableOperationsQueue.haltExecution = true
                     }
                 }
@@ -157,9 +154,9 @@ public class StepGroup: Executable {
                     do {
                         try step.execute()
                     } catch {
-#if canImport(LoggerCenter)
-                        LogCenter.default.error("\(error.localizedDescription)")
-#endif
+                        if BipBop.enableLogging {
+                            BipBop.logger.error("\(error.localizedDescription)")
+                        }
                         self?.stackableOperationsQueue.haltExecution = true
                     }
                 })
